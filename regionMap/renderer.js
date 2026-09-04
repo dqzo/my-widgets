@@ -20,6 +20,8 @@ const coordCache = new Map();
 let userAmapKey = '';
 // 本地行政区划树形数据（省→市→县→乡镇，1.84MB）
 let pcasTree = null;
+// 村级数据索引（乡镇 code → [村数组]，81MB villages.json 懒加载）
+let villagesByStreet = null;
 
 // ===== 模式检测 & API 适配 =====
 const isElectron = !!(window.electronAPI && window.electronAPI.getConfig);
@@ -96,8 +98,14 @@ function api() {
         return [];
       }
       
-      // 乡镇→村：暂时返回空（村级数据太大，后续可按需加）
+      // 乡镇→村：从本地 villages.json 查（81MB，首次加载慢，之后缓存）
       if (level === 'town') {
+        const index = await this.loadVillages();
+        if (!index) return [];
+        const villages = index.get(String(parentAdcode));
+        if (villages && villages.length > 0) {
+          return villages.map(v => ({ code: v.code, name: v.name }));
+        }
         return [];
       }
       
@@ -125,6 +133,24 @@ function api() {
           if (found) return found;
         }
       }
+      return null;
+    },
+    // 加载村级数据并按 streetCode 建索引（81MB，首次加载慢，之后缓存）
+    async loadVillages() {
+      if (villagesByStreet) return villagesByStreet;
+      try {
+        const res = await fetch('data/villages.json');
+        if (res.ok) {
+          const arr = await res.json();
+          villagesByStreet = new Map();
+          for (const v of arr) {
+            const key = String(v.streetCode);
+            if (!villagesByStreet.has(key)) villagesByStreet.set(key, []);
+            villagesByStreet.get(key).push(v);
+          }
+          return villagesByStreet;
+        }
+      } catch {}
       return null;
     },
     async toAdcode(code, level) {
