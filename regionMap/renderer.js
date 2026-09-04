@@ -57,31 +57,35 @@ function api() {
     },
     async getChildren(level, parentCode) {
       if (isElectron) return e.getChildren(level, parentCode);
-      const parentAdcode = await this.toAdcode(String(parentCode), LEVEL_KEYS[LEVEL_KEYS.indexOf(level) - 1] || 'province');
+      // level = parent 的级别，我们要获取 parent 的下级
+      // province(省) → city(市/直辖市直接到区县) → county(区县) → town(乡镇) → village(村)
+      const parentAdcode = await this.toAdcode(String(parentCode), level);
       
-      // 省→市、市→区县：从 DataV GeoJSON 提取子区域
-      if (level === 'city' || level === 'county') {
+      // 省→市、市→区县：从本地 GeoJSON 提取子区域
+      if (level === 'province' || level === 'city') {
         const geo = await this.fetchGeojson(parentAdcode);
         if (!geo || !geo.features) return [];
         const children = [];
         for (const f of geo.features) {
           const ac = String(f.properties.adcode);
           if (ac === parentAdcode) continue;
-          if (level === 'city' && ac.endsWith('00') && !ac.endsWith('0000')) {
+          // parent 是省 → children 应该是市（xx00 结尾但不是 xx0000）
+          // parent 是市 → children 应该是区县（不以 00 结尾）
+          if (level === 'province' && ac.endsWith('00') && !ac.endsWith('0000')) {
             children.push({ code: ac.substring(0, 4), name: f.properties.name });
-          } else if (level === 'county' && !ac.endsWith('00')) {
+          } else if (level === 'city' && !ac.endsWith('00')) {
             children.push({ code: ac, name: f.properties.name });
           }
         }
-        // 直辖市处理：省→市 没有地级市这一层（直接到区县），返回虚拟"市辖区"
-        if (level === 'city' && children.length === 0 && geo.features.length > 0) {
+        // 直辖市处理：省→市 没有地级市这一层，返回虚拟"市辖区"
+        if (level === 'province' && children.length === 0 && geo.features.length > 0) {
           return [{ code: parentAdcode.substring(0, 4) || parentAdcode, name: '市辖区' }];
         }
         return children;
       }
       
       // 区县→乡镇、乡镇→村：DataV 不覆盖，用高德 district API
-      if (level === 'town' || level === 'village') {
+      if (level === 'county' || level === 'town') {
         const key = userAmapKey || '13f1c508d451e2000a1e8b9a525a4f63';
         try {
           const url = `https://restapi.amap.com/v3/config/district?keywords=${encodeURIComponent(parentAdcode)}&subdistrict=1&key=${key}`;
