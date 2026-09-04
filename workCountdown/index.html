@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ff6b35">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="下班倒计时">
+  <link rel="manifest" href="manifest.json">
+  <title>下班倒计时</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="widget-container" id="widgetContainer">
+    <div class="widget-main">
+      <div class="left-section">
+        <div class="countdown-label" id="countdownLabel">距离下班还有</div>
+        <div class="countdown-time" id="countdownTime">00:00:00</div>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="info-label">周五</div>
+            <div class="info-value" id="fridayCount">0</div>
+            <div class="info-unit">天</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">发薪</div>
+            <div class="info-value" id="salaryCount">0</div>
+            <div class="info-unit">天</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">今天赚了</div>
+            <div class="info-value" id="earnedToday">0.00</div>
+            <div class="info-unit">¥</div>
+          </div>
+        </div>
+      </div>
+      <div class="right-section">
+        <div class="pet-container">
+          <div class="pet-image" id="petImage">
+            <img class="pet-placeholder cat" src="img/cat.gif" alt="小猫咪">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="settings-toggle" id="settingsToggle" title="设置">⚙</div>
+    <div class="lock-toggle" id="lockToggle" title="锁定/解锁">🔓</div>
+    <div class="top-toggle" id="topToggle" title="置顶/取消置顶">📌</div>
+  </div>
+
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-header">
+      <span class="settings-title">设置</span>
+      <div class="header-actions">
+        <span class="header-lock" id="headerLock" title="锁定组件">🔓</span>
+        <span class="settings-close" id="settingsClose">✕</span>
+      </div>
+    </div>
+    <div class="settings-content">
+      <div class="setting-item">
+        <label>组件名称</label>
+        <input type="text" id="widgetName" maxlength="20" placeholder="下班倒计时">
+        <span class="char-count" id="nameCount">0/20</span>
+      </div>
+
+      <div class="setting-item">
+        <label>工作日</label>
+        <div class="weekdays" id="weekdays">
+          <span class="day-btn" data-day="1">一</span>
+          <span class="day-btn" data-day="2">二</span>
+          <span class="day-btn" data-day="3">三</span>
+          <span class="day-btn" data-day="4">四</span>
+          <span class="day-btn" data-day="5">五</span>
+          <span class="day-btn" data-day="6">六</span>
+          <span class="day-btn" data-day="0">日</span>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label>工作时间</label>
+        <div class="time-range">
+          <input type="time" id="startTime" value="08:30">
+          <span class="time-sep">至</span>
+          <input type="time" id="endTime" value="18:00">
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label>字体颜色</label>
+        <div class="color-picker" id="textColorPicker">
+          <span class="color-option" data-color="#000000" style="background:#000000"></span>
+          <span class="color-option" data-color="#ffffff" style="background:#ffffff;border:1px solid #ddd"></span>
+          <span class="color-option" data-color="#e74c3c" style="background:#e74c3c"></span>
+          <span class="color-option active" data-color="#ff6b35" style="background:#ff6b35"></span>
+          <span class="color-option" data-color="#f39c12" style="background:#f39c12"></span>
+          <span class="color-option" data-color="#27ae60" style="background:#27ae60"></span>
+          <span class="color-option" data-color="#1abc9c" style="background:#1abc9c"></span>
+          <span class="color-option" data-color="#3498db" style="background:#3498db"></span>
+          <span class="color-option" data-color="#9b59b6" style="background:#9b59b6"></span>
+          <span class="color-option" data-color="#795548" style="background:#795548"></span>
+          <span class="color-option" data-color="#e91e63" style="background:#e91e63"></span>
+          <label class="color-custom">
+            <input type="color" id="customTextColor" value="#ff6b35">
+            <span>自定义</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label>背景颜色</label>
+        <div class="color-picker" id="bgColorPicker">
+          <span class="color-option" data-color="#000000" style="background:#000000"></span>
+          <span class="color-option active" data-color="#ffffff" style="background:#ffffff;border:1px solid #ddd"></span>
+          <span class="color-option" data-color="#e74c3c" style="background:#e74c3c"></span>
+          <span class="color-option" data-color="#ff6b35" style="background:#ff6b35"></span>
+          <span class="color-option" data-color="#f39c12" style="background:#f39c12"></span>
+          <span class="color-option" data-color="#27ae60" style="background:#27ae60"></span>
+          <span class="color-option" data-color="#1abc9c" style="background:#1abc9c"></span>
+          <span class="color-option" data-color="#3498db" style="background:#3498db"></span>
+          <span class="color-option" data-color="#9b59b6" style="background:#9b59b6"></span>
+          <span class="color-option" data-color="#795548" style="background:#795548"></span>
+          <span class="color-option" data-color="#e91e63" style="background:#e91e63"></span>
+          <label class="color-custom">
+            <input type="color" id="customBgColor" value="#ffffff">
+            <span>自定义</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label>透明度</label>
+        <div class="opacity-slider">
+          <input type="range" id="opacity" min="10" max="100" value="100">
+          <span id="opacityValue">100%</span>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label>发薪日</label>
+        <select id="salaryDay">
+          <option value="1">每月 1 日</option>
+          <option value="5">每月 5 日</option>
+          <option value="10">每月 10 日</option>
+          <option value="15" selected>每月 15 日</option>
+          <option value="20">每月 20 日</option>
+          <option value="25">每月 25 日</option>
+          <option value="28">每月 28 日</option>
+          <option value="30">每月 30 日</option>
+        </select>
+      </div>
+
+      <div class="setting-item">
+        <label>每日收入</label>
+        <div class="income-input">
+          <input type="number" id="dailyIncome" value="150" min="0" step="0.01">
+          <span class="unit">元</span>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label>宠物形象</label>
+        <div class="pet-selector">
+          <div class="pet-option active" data-pet="cat">
+            <img class="pet-icon" src="img/cat.gif" alt="小猫咪">
+            <span>小猫咪</span>
+          </div>
+          <div class="pet-option" data-pet="dog">
+            <img class="pet-icon" src="img/dog.gif" alt="小狗狗">
+            <span>小狗狗</span>
+          </div>
+          <div class="pet-option" data-pet="bear">
+            <img class="pet-icon" src="img/bear.gif" alt="小熊熊">
+            <span>小熊熊</span>
+          </div>
+          <div class="pet-option" data-pet="rabbit">
+            <img class="pet-icon" src="img/rabbit.gif" alt="小兔兔">
+            <span>小兔兔</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="save-btn" id="saveBtn">修改完成</button>
+    </div>
+  </div>
+
+  <script src="api_adapter.js"></script>
+  <script src="renderer.js"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('sw.js').catch(function(e) {
+        console.warn('SW registration failed:', e);
+      });
+    });
+  }
+  </script>
+</body>
+</html>

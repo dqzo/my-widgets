@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a2942">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="工具箱">
+  <link rel="manifest" href="manifest.json">
+  <title>我的小组件</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      min-height: 100vh;
+      padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 20px);
+      background: linear-gradient(135deg, #1a2942 0%, #0f1520 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #fff;
+      touch-action: manipulation;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      text-decoration: none;
+      color: #fff;
+      transition: transform 0.15s, background 0.15s;
+      min-height: 140px;
+      touch-action: manipulation;
+    }
+
+    .card:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .card-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .card-desc {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+      text-align: center;
+    }
+
+    .card.map { background: linear-gradient(135deg, rgba(90, 176, 255, 0.2), rgba(90, 176, 255, 0.05)); }
+    .card.muyu { background: linear-gradient(135deg, rgba(210, 105, 30, 0.2), rgba(210, 105, 30, 0.05)); }
+    .card.countdown { background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(255, 107, 53, 0.05)); }
+    .card.tracker { background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.05)); }
+
+    .hint {
+      margin-top: 24px;
+      padding: 14px;
+      background: rgba(255, 170, 50, 0.1);
+      border: 1px solid rgba(255, 170, 50, 0.3);
+      border-radius: 10px;
+      font-size: 12px;
+      color: rgba(255, 200, 100, 0.9);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .hint code {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    @media (min-width: 600px) {
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+      .card { padding: 32px 16px; min-height: 160px; }
+      .card-icon { font-size: 48px; }
+      .card-title { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🛠 我的小组件</h1>
+    <p>选择一个组件开始使用</p>
+  </div>
+
+  <div class="grid">
+    <a class="card map" href="regionMap/index.html">
+      <div class="card-icon">🗺</div>
+      <div class="card-title">行政区划地图</div>
+      <div class="card-desc">省市县乡村五级联动</div>
+    </a>
+
+    <a class="card muyu" href="muyu/index.html">
+      <div class="card-icon">🪵</div>
+      <div class="card-title">电子木鱼</div>
+      <div class="card-desc">功德 +1</div>
+    </a>
+
+    <a class="card countdown" href="workCountdown/index.html">
+      <div class="card-icon">⏰</div>
+      <div class="card-title">下班倒计时</div>
+      <div class="card-desc">周五 · 发薪 · 今日收入</div>
+    </a>
+
+    <a class="card tracker" href="tracker/index.html">
+      <div class="card-icon">📊</div>
+      <div class="card-title">记账统计</div>
+      <div class="card-desc">导入导出 Excel</div>
+    </a>
+  </div>
+
+  <div class="hint">
+    💡 提示：在手机浏览器中打开后，选择「添加到主屏幕」即可像 App 一样使用
+  </div>
+
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('sw.js').catch(function(e) {
+        console.warn('SW registration failed:', e);
+      });
+    });
+  }
+  </script>
+</body>
+</html>

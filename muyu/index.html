@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#4a3520">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="电子木鱼">
+  <link rel="manifest" href="manifest.json">
+  <title>电子木鱼</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="widget-container">
+    <div class="widget-header">
+      <!-- <div class="header-title">🪵 电子木鱼</div> -->
+      <div class="header-title"></div>
+      <div class="header-actions">
+        <div class="sound-toggle" id="soundToggle" title="开关音效">🔊</div>
+        <div class="top-toggle" id="topToggle" title="置顶/取消置顶">📌</div>
+        <div class="settings-toggle" id="settingsToggle" title="设置">⚙</div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="merit-count" id="meritCount">功德 +0</div>
+      <div class="muyu-container" id="muyuBtn">
+        <div class="muyu-outer">
+          <div class="muyu-body">
+            <div class="muyu-groove"></div>
+            <div class="muyu-highlight"></div>
+          </div>
+          <div class="muyu-base"></div>
+        </div>
+        <div class="merit-text" id="meritText">功德 +1</div>
+      </div>
+      <div class="click-hint">点击木鱼积攒功德</div>
+    </div>
+
+    <div class="float-text-container" id="floatTextContainer"></div>
+  </div>
+
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-header">
+      <span class="settings-title">设置</span>
+      <span class="settings-close" id="settingsClose">✕</span>
+    </div>
+    <div class="settings-content">
+      <div class="setting-item">
+        <label>透明度</label>
+        <div class="opacity-slider">
+          <input type="range" id="opacity" min="10" max="100" value="100">
+          <span id="opacityValue">100%</span>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label>始终置顶</label>
+        <div class="toggle-switch">
+          <input type="checkbox" id="alwaysOnTop" checked>
+          <label for="alwaysOnTop"></label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label>音效</label>
+        <div class="toggle-switch">
+          <input type="checkbox" id="soundEnabled" checked>
+          <label for="soundEnabled"></label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label>功德数</label>
+        <div class="count-display">
+          <span id="currentCount">0</span>
+          <button class="reset-btn" id="resetBtn">重置</button>
+        </div>
+      </div>
+
+      <button class="save-btn" id="saveBtn">保存设置</button>
+    </div>
+  </div>
+
+  <script src="api_adapter.js"></script>
+  <script src="renderer.js"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('sw.js').catch(function(e) {
+        console.warn('SW registration failed:', e);
+      });
+    });
+  }
+  </script>
+</body>
+</html>
