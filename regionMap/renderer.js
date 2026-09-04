@@ -112,21 +112,24 @@ function api() {
     async fetchGeojson(adcode) {
       if (isElectron) return e.fetchGeojson(adcode);
       const code = String(adcode);
-      // 1️⃣ 优先从本地 data/ 目录读取（GitHub Pages 本地部署，绕过 DataV Referer 限制）
-      try {
-        const localUrl = `data/${code}_full.json`;
-        const res = await fetch(localUrl);
-        if (res.ok) {
-          const j = await res.json();
-          if (j && j.features && j.features.length > 0) return j;
-        }
-      } catch {}
+      // 1️⃣ 优先从本地 data/ 目录读取
+      // 先试 _full.json（含下级子区域，适合省/市级），再试 .json（区域自身边界，适合区县）
+      const localTries = [`data/${code}_full.json`, `data/${code}.json`];
+      for (const url of localTries) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const j = await res.json();
+            if (j && j.features && j.features.length > 0) return j;
+          }
+        } catch {}
+      }
       // 2️⃣ fallback：DataV API（开发调试用）
-      const urls = [
+      const remoteTries = [
         `https://geo.datav.aliyun.com/areas_v3/bound/${code}_full.json`,
         `https://geo.datav.aliyun.com/areas_v3/bound/${code}.json`
       ];
-      for (const url of urls) {
+      for (const url of remoteTries) {
         try {
           const res = await fetch(url);
           if (res.ok) {
