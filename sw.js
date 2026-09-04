@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hub-v8';
+const CACHE_NAME = 'hub-v10';
 // 只预缓存核心文件（GeoJSON 数据太大，改为按需缓存）
 const PRECACHE_URLS = [
   './',

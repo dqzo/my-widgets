@@ -18,6 +18,8 @@ LEVEL_KEYS.forEach(k => { cascade[k] = { code: null, name: null }; });
 // 浏览器版坐标缓存
 const coordCache = new Map();
 let userAmapKey = '';
+// 本地行政区划树形数据（省→市→县→乡镇，1.84MB）
+let pcasTree = null;
 
 // ===== 模式检测 & API 适配 =====
 const isElectron = !!(window.electronAPI && window.electronAPI.getConfig);
@@ -69,8 +71,6 @@ function api() {
         for (const f of geo.features) {
           const ac = String(f.properties.adcode);
           if (ac === parentAdcode) continue;
-          // parent 是省 → children 应该是市（xx00 结尾但不是 xx0000）
-          // parent 是市 → children 应该是区县（不以 00 结尾）
           if (level === 'province' && ac.endsWith('00') && !ac.endsWith('0000')) {
             children.push({ code: ac.substring(0, 4), name: f.properties.name });
           } else if (level === 'city' && !ac.endsWith('00')) {
@@ -84,21 +84,48 @@ function api() {
         return children;
       }
       
-      // 区县→乡镇、乡镇→村：DataV 不覆盖，用高德 district API
-      if (level === 'county' || level === 'town') {
-        const key = userAmapKey || '13f1c508d451e2000a1e8b9a525a4f63';
-        try {
-          const url = `https://restapi.amap.com/v3/config/district?keywords=${encodeURIComponent(parentAdcode)}&subdistrict=1&key=${key}`;
-          const r = await fetch(url);
-          const j = await r.json();
-          if (j.districts && j.districts.length > 0 && j.districts[0].districts) {
-            return j.districts[0].districts.map(d => ({ code: d.adcode || d.name, name: d.name }));
-          }
-        } catch {}
+      // 区县→乡镇：从本地 pcas-code.json 树形数据查
+      if (level === 'county') {
+        const tree = await this.loadPcas();
+        if (!tree) return [];
+        // county code 在 GeoJSON 里是 6 位 (如 110101)，在 pcas 里也是 6 位
+        const node = this.findNodeInTree(tree, parentAdcode);
+        if (node && node.children && node.children.length > 0) {
+          return node.children.map(c => ({ code: c.code, name: c.name }));
+        }
+        return [];
+      }
+      
+      // 乡镇→村：暂时返回空（村级数据太大，后续可按需加）
+      if (level === 'town') {
         return [];
       }
       
       return [];
+    },
+    // 加载本地行政区划树形数据（懒加载，只加载一次）
+    async loadPcas() {
+      if (pcasTree) return pcasTree;
+      try {
+        const res = await fetch('data/pcas-code.json');
+        if (res.ok) {
+          pcasTree = await res.json();
+          return pcasTree;
+        }
+      } catch {}
+      return null;
+    },
+    // 递归在 pcas 树中查找指定 code 的节点
+    findNodeInTree(tree, code) {
+      code = String(code);
+      for (const node of tree) {
+        if (String(node.code) === code) return node;
+        if (node.children && node.children.length > 0) {
+          const found = this.findNodeInTree(node.children, code);
+          if (found) return found;
+        }
+      }
+      return null;
     },
     async toAdcode(code, level) {
       if (isElectron) return e.toAdcode(code, level);
